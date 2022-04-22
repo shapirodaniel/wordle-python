@@ -54,7 +54,7 @@ def evaluate_guess(game_state, guess):
         if game_state["answer"][idx] == char:
             result.append({"value": char.upper(), "color": bcolors.GREEN})
             continue
-        if char in game_state["answer"]:
+        if game_state["answer"][idx] != char and char in game_state["answer"]:
             result.append({"value": char.upper(), "color": bcolors.YELLOW})
             continue
         else:
@@ -65,42 +65,54 @@ def evaluate_guess(game_state, guess):
 def get_current_guess(game_state):
     current_guess = game_state["guesses"][len(game_state["guesses"]) - 1]
     result = ""
-    for idx, obj in enumerate(current_guess):
+    for obj in current_guess:
         if obj["color"] is not None:
             result += obj["color"]
         result += obj["value"]
         if obj["color"] is not None:
             result += bcolors.ENDC
-        if idx < len(current_guess):
-            result += " "
-    print(current_guess)
+        result += " "
     return result
 
 
 def game_loop():
-    game_state = initialize_game()
     print(f"welcome to {bcolors.GREEN}python wordle!{bcolors.ENDC}\n")
+
+    game_state = initialize_game()
+
     while game_state["playing"] == True:
         print(f"current guess: {get_current_guess(game_state)}\n")
         guess = input()
+
+        # error handling
+        while len(guess) != 5:
+            print("all wordle words are 5 letters! try again...")
+            guess = input()
+
         result = evaluate_guess(game_state, guess)
         game_state["guesses"].append(result)
+
         if all([x["color"] == bcolors.GREEN for x in result]):
             game_state["won"] = True
             print(f"you win, the word was {get_current_guess(game_state)}!")
             exit(0)
         elif len(game_state["guesses"]) > 6:
             print("you lose :/ play again? type 1 for yes, 0 for no...")
+
             play_again = input()
-    while play_again != "0" and play_again != "1":
-        print("type 1 to play again or 0 to exit wordle...")
-        play_again = input()
-    if play_again == 1:
-        game_state = initialize_game()
-    else:
-        game_state["playing"] = False
-        print("thanks for playing wordle!")
-        exit(0)
+
+            while play_again != "0" and play_again != "1":
+                print("type 1 to play again or 0 to exit wordle...")
+                play_again = input()
+
+            if play_again == "1":
+                game_state = initialize_game()
+                continue
+
+            else:
+                game_state["playing"] = False
+                print("thanks for playing wordle!")
+                exit(0)
 
 
 game_loop()
