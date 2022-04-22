@@ -3,7 +3,7 @@ from random import random
 
 
 class bcolors:
-    YELLOW = "\33[33m"
+    YELLOW = "\33[93m"
     GREEN = "\033[92m"
     ENDC = "\033[0m"
 
@@ -44,20 +44,21 @@ def initialize_game():
             ]
         ],
         "won": False,
+        "playing": True,
     }
 
 
 def evaluate_guess(game_state, guess):
     result = []
-    for idx, char in enumerate(guess.upper().split("")):
-        if game_state.answer[idx] == char:
-            result.append({"value": char, "color": bcolors.GREEN})
+    for idx, char in enumerate(list(guess.upper())):
+        if game_state["answer"][idx] == char:
+            result.append({"value": char.upper(), "color": bcolors.GREEN})
             continue
-        if char in game_state.answer:
-            result.append({"value": char, "color": bcolors.YELLOW})
+        if char in game_state["answer"]:
+            result.append({"value": char.upper(), "color": bcolors.YELLOW})
             continue
         else:
-            result.append({"value": char, "color": None})
+            result.append({"value": char.upper(), "color": None})
     return result
 
 
@@ -65,40 +66,41 @@ def get_current_guess(game_state):
     current_guess = game_state["guesses"][len(game_state["guesses"]) - 1]
     result = ""
     for idx, obj in enumerate(current_guess):
+        if obj["color"] is not None:
+            result += obj["color"]
         result += obj["value"]
+        if obj["color"] is not None:
+            result += bcolors.ENDC
         if idx < len(current_guess):
             result += " "
+    print(current_guess)
     return result
 
 
 def game_loop():
     game_state = initialize_game()
-    print(game_state)
-
-    print("welcome to python wordle!\n")
-    print(f"current guess: {get_current_guess(game_state)}\n")
-
-    while game_state.playing == True:
+    print(f"welcome to {bcolors.GREEN}python wordle!{bcolors.ENDC}\n")
+    while game_state["playing"] == True:
+        print(f"current guess: {get_current_guess(game_state)}\n")
         guess = input()
         result = evaluate_guess(game_state, guess)
-        game_state.guesses.append(result)
-        for char_obj in result:
-            if all(char_obj.color == bcolors.GREEN):
-                game_state.won = True
-                print("you win!")
-                print(game_state.guesses[len(game_state.guesses) - 1])
-            elif len(game_state.guesses) == 6:
-                print("you lose :/ play again? type 1 for yes, 0 for no...")
-                play_again = input()
-                while play_again != 0 or play_again != 1:
-                    print("type 1 to play again or 0 to exit wordle...")
-                if play_again == 1:
-                    game_state = initialize_game()
-                else:
-                    game_state.playing = False
-
-    print("thanks for playing wordle!")
-    exit(0)
+        game_state["guesses"].append(result)
+        if all([x["color"] == bcolors.GREEN for x in result]):
+            game_state["won"] = True
+            print(f"you win, the word was {get_current_guess(game_state)}!")
+            exit(0)
+        elif len(game_state["guesses"]) > 6:
+            print("you lose :/ play again? type 1 for yes, 0 for no...")
+            play_again = input()
+    while play_again != "0" and play_again != "1":
+        print("type 1 to play again or 0 to exit wordle...")
+        play_again = input()
+    if play_again == 1:
+        game_state = initialize_game()
+    else:
+        game_state["playing"] = False
+        print("thanks for playing wordle!")
+        exit(0)
 
 
 game_loop()
