@@ -558,8 +558,6 @@ words = [
     "DADDY",
     "QUASI",
     "ARISE",
-    "DONT",
-    "REPOST",
     "AGING",
     "VALET",
     "OPIUM",
