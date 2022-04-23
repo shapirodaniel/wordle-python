@@ -2,7 +2,6 @@ from words import words
 from random import random
 import copy
 import string
-import pprint
 
 
 class bcolors:
