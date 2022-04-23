@@ -44,19 +44,29 @@ def initialize_game():
 
 
 def evaluate_guess(game_state, guess):
-    result = []
-    letter_distribution = deepcopy(game_state["letter_distribution"])
-    for idx, char in enumerate(list(guess.upper())):
-        if game_state["answer"][idx] == char:
-            result.append({"value": char.upper(), "color": bcolors.GREEN})
-            letter_distribution[char] -= 1
+    # initialize empty list with 5 spots for direct index assignment
+    result = [None] * 5
+    guess_charlist = list(guess.upper())
+    answer_charlist = list(game_state["answer"])
+    letters_ht = deepcopy(game_state["letter_distribution"])
+
+    # first pass, convert all exact matches and update ht
+    for i, char in enumerate(guess_charlist):
+        if guess_charlist[i] == answer_charlist[i]:
+            result[i] = {"value": char, "color": bcolors.GREEN}
+            letters_ht[char] -= 1
+
+    # second pass with ht
+    for i, char in enumerate(guess_charlist):
+        # skip exact matches we've already found
+        if result[i] is not None:
             continue
-        elif char in game_state["answer"] and letter_distribution[char] > 0:
-            result.append({"value": char.upper(), "color": bcolors.YELLOW})
-            letter_distribution[char] -= 1
-            continue
+        elif char in game_state["answer"] and letters_ht[char] > 0:
+            result[i] = {"value": char, "color": bcolors.YELLOW}
+            letters_ht[char] -= 1
         else:
-            result.append({"value": char.upper(), "color": None})
+            result[i] = {"value": char, "color": None}
+
     return result
 
 
@@ -100,7 +110,8 @@ def game_loop():
                 print("thanks for playing wordle!")
                 exit(0)
         elif len(game_state["guesses"]) > 6:
-            print("you lose :/ play again? type 1 for yes, 0 for no...\n")
+            print(f"you lose :/ the word was {game_state['answer']}")
+            print("play again? type 1 for yes, 0 for no...\n")
             play_again = input()
             while play_again != "0" and play_again != "1":
                 print("type 1 to play again or 0 to exit wordle...\n")
