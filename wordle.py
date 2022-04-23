@@ -1,11 +1,14 @@
 from words import words
 from random import random
-from copy import deepcopy
+import copy
+import string
+import pprint
 
 
 class bcolors:
     YELLOW = "\33[93m"
     GREEN = "\033[92m"
+    DARK_GRAY = "\033[90m"
     ENDC = "\033[0m"
 
 
@@ -27,7 +30,6 @@ def get_letter_distribution(word):
 def initialize_game():
     answer = select_random_word(words)
     letter_distribution = get_letter_distribution(answer)
-    print(letter_distribution)
     return {
         "answer": answer,
         "letter_distribution": letter_distribution,
@@ -40,6 +42,9 @@ def initialize_game():
                 {"value": "_", "color": None},
             ]
         ],
+        # { 'A': None, 'B': None, ... }
+        # will be updated whenever a char match is found
+        "alphabet": dict.fromkeys(string.ascii_uppercase, None),
     }
 
 
@@ -48,14 +53,13 @@ def evaluate_guess(game_state, guess):
     result = [None] * 5
     guess_charlist = list(guess.upper())
     answer_charlist = list(game_state["answer"])
-    letters_ht = deepcopy(game_state["letter_distribution"])
-
+    letters_ht = copy.deepcopy(game_state["letter_distribution"])
     # first pass, convert all exact matches and update ht
     for i, char in enumerate(guess_charlist):
         if guess_charlist[i] == answer_charlist[i]:
             result[i] = {"value": char, "color": bcolors.GREEN}
+            game_state["alphabet"][char] = bcolors.GREEN
             letters_ht[char] -= 1
-
     # second pass with ht
     for i, char in enumerate(guess_charlist):
         # skip exact matches we've already found
@@ -63,10 +67,11 @@ def evaluate_guess(game_state, guess):
             continue
         elif char in game_state["answer"] and letters_ht[char] > 0:
             result[i] = {"value": char, "color": bcolors.YELLOW}
+            game_state["alphabet"][char] = bcolors.YELLOW
             letters_ht[char] -= 1
         else:
             result[i] = {"value": char, "color": None}
-
+            game_state["alphabet"][char] = bcolors.DARK_GRAY
     return result
 
 
@@ -83,13 +88,23 @@ def get_current_guess(game_state):
     return result
 
 
-# todo:
-# print alphabet with letter distribution and colors after each guess
+def get_current_alphabet(alphabet_dict):
+    result = bcolors.ENDC
+    for (letter, color) in alphabet_dict.items():
+        if color is not None:
+            result += f"{color}{letter}{bcolors.ENDC}"
+        else:
+            result += letter
+        result += " "
+    return result
+
+
 def game_loop():
     print(f"welcome to {bcolors.GREEN}python wordle!{bcolors.ENDC}\n")
     game_state = initialize_game()
     while True:
         print(f"current guess: {get_current_guess(game_state)}\n")
+        print(get_current_alphabet(game_state["alphabet"]))
         guess = input()
         while len(guess) != 5:
             print("all wordle words are 5 letters! try again...\n")
