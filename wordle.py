@@ -40,7 +40,6 @@ def initialize_game():
 
 
 def evaluate_guess(game_state, guess):
-    # initialize empty list with 5 spots for direct index assignment
     result = [None] * 5
     guess_charlist = list(guess)
     answer_charlist = list(game_state["answer"])
