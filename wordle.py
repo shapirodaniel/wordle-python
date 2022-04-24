@@ -5,9 +5,10 @@ import string
 
 
 class bcolors:
-    YELLOW = "\33[93m"
-    GREEN = "\033[92m"
     DARK_GRAY = "\033[90m"
+    RED = "\33[91m"
+    GREEN = "\033[92m"
+    YELLOW = "\33[93m"
     ENDC = "\033[0m"
 
 
@@ -141,9 +142,10 @@ def game_loop():
         if not won and not lost:
             continue
         elif won:
-            print(f"you win, the word was {get_current_guess(game_state)}!\n")
+            winning_word = get_current_guess(game_state).replace(" ", "")
+            print(f"you win, the word was {winning_word}!\n")
         elif lost:
-            print(f"you lose :/ the word was {game_state['answer']}")
+            print(f"you lose :/ the word was {bcolors.RED}{game_state['answer']}{bcolors.ENDC}")
 
         print("play again? type 1 for yes, 0 for no...\n")
         play_again = input("> ").strip()
