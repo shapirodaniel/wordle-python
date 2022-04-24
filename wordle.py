@@ -72,10 +72,9 @@ def latest_guess(guesses):
     return guesses[len(guesses) - 1]
 
 
-def get_current_guess(game_state):
-    current_guess = latest_guess(game_state["guesses"])
+def build_guess(guess):
     result = ""
-    for obj in current_guess:
+    for obj in guess:
         if obj["color"] is not None:
             result += obj["color"]
         result += obj["value"]
@@ -85,17 +84,15 @@ def get_current_guess(game_state):
     return result
 
 
+def get_current_guess(game_state):
+    current_guess = latest_guess(game_state["guesses"])
+    return build_guess(current_guess)
+
+
 def get_all_guesses(game_state):
     result = ""
     for guess in game_state["guesses"]:
-        for obj in guess:
-            if obj["color"] is not None:
-                result += obj["color"]
-            result += obj["value"]
-            if obj["color"] is not None:
-                result += bcolors.ENDC
-            result += " "
-        result += "\n"
+        result += build_guess(guess) + "\n"
     return result
 
 
