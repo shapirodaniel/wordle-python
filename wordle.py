@@ -152,7 +152,7 @@ def game_loop():
 
         while play_again != "0" and play_again != "1":
             print("type 1 to play again or 0 to exit wordle...\n")
-            play_again = input("> ")
+            play_again = input("> ").strip()
 
         if play_again == "1":
             game_state = initialize_game()
