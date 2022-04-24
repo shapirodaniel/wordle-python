@@ -117,11 +117,8 @@ def already_guessed(game_state, guess):
 
 def game_loop():
     print(f"welcome to {bcolors.GREEN}python wordle!{bcolors.ENDC}\n")
-
     # todo: gives wordle directions here...
-
     game_state = initialize_game()
-
     while True:
         print(f"current guess: {get_current_guess(game_state)}\n")
         print(get_current_alphabet(game_state["alphabet"]))
@@ -138,7 +135,6 @@ def game_loop():
 
         result = evaluate_guess(game_state, guess)
         game_state["guesses"].append(result)
-
         won = all([x["color"] == bcolors.GREEN for x in result])
         lost = len(game_state["guesses"]) > 6
 
