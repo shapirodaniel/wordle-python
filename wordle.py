@@ -5,7 +5,7 @@ import string
 
 
 class bcolors:
-    YELLOW = "\33[93m"
+    RED = "\33[91m"
     GREEN = "\033[92m"
     DARK_GRAY = "\033[90m"
     ENDC = "\033[0m"
@@ -65,8 +65,8 @@ def evaluate_guess(game_state, guess):
         if result[i] is not None:
             continue
         elif char in game_state["answer"] and letters_ht[char] > 0:
-            result[i] = {"value": char, "color": bcolors.YELLOW}
-            game_state["alphabet"][char] = bcolors.YELLOW
+            result[i] = {"value": char, "color": bcolors.RED}
+            game_state["alphabet"][char] = bcolors.RED
             letters_ht[char] -= 1
         else:
             result[i] = {"value": char, "color": None}
@@ -98,6 +98,20 @@ def get_current_alphabet(alphabet_dict):
     return result
 
 
+def already_guessed(game_state, guess):
+    count = 0
+    guess = guess.upper()
+    for previous_guess in game_state["guesses"]:
+        for i, char_dict in enumerate(previous_guess):
+            if char_dict["value"] == guess[i]:
+                count += 1
+        if count == 5:
+            return True
+        else:
+            count = 0
+    return False
+
+
 def game_loop():
     print(f"welcome to {bcolors.GREEN}python wordle!{bcolors.ENDC}\n")
     game_state = initialize_game()
@@ -107,6 +121,12 @@ def game_loop():
         guess = input()
         while len(guess) != 5:
             print("all wordle words are 5 letters! try again...\n")
+            guess = input()
+        while guess.upper() not in words:
+            print(f"{guess.upper()} is not in the wordle dictionary! try again...\n")
+            guess = input()
+        while already_guessed(game_state, guess):
+            print(f"{guess.upper()} was already guessed! try again...\n")
             guess = input()
         result = evaluate_guess(game_state, guess)
         game_state["guesses"].append(result)
