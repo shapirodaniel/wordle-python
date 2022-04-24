@@ -50,7 +50,7 @@ def initialize_game():
 def evaluate_guess(game_state, guess):
     # initialize empty list with 5 spots for direct index assignment
     result = [None] * 5
-    guess_charlist = list(guess.upper())
+    guess_charlist = list(guess)
     answer_charlist = list(game_state["answer"])
     letters_ht = copy.deepcopy(game_state["letter_distribution"])
     # first pass, convert all exact matches and update ht
@@ -74,8 +74,12 @@ def evaluate_guess(game_state, guess):
     return result
 
 
+def latest_guess(guesses):
+    return guesses[len(guesses) - 1]
+
+
 def get_current_guess(game_state):
-    current_guess = game_state["guesses"][len(game_state["guesses"]) - 1]
+    current_guess = latest_guess(game_state["guesses"])
     result = ""
     for obj in current_guess:
         if obj["color"] is not None:
@@ -100,7 +104,6 @@ def get_current_alphabet(alphabet_dict):
 
 def already_guessed(game_state, guess):
     count = 0
-    guess = guess.upper()
     for previous_guess in game_state["guesses"]:
         for i, char_dict in enumerate(previous_guess):
             if char_dict["value"] == guess[i]:
@@ -115,28 +118,25 @@ def already_guessed(game_state, guess):
 def game_loop():
     print(f"welcome to {bcolors.GREEN}python wordle!{bcolors.ENDC}\n")
 
+    # todo: gives wordle directions here...
+
     game_state = initialize_game()
 
     while True:
         print(f"current guess: {get_current_guess(game_state)}\n")
         print(get_current_alphabet(game_state["alphabet"]))
-
-        guess = input()
-
+        guess = input("> ").strip().upper()
         while len(guess) != 5:
             print("all wordle words are 5 letters! try again...\n")
-            guess = input()
-
-        while guess.upper() not in words:
-            print(f"{guess.upper()} is not in the wordle dictionary! try again...\n")
-            guess = input()
-
+            guess = input("> ").strip().upper()
+        while guess not in words:
+            print(f"{guess} is not in the wordle dictionary! try again...\n")
+            guess = input("> ").strip().upper()
         while already_guessed(game_state, guess):
-            print(f"{guess.upper()} was already guessed! try again...\n")
-            guess = input()
+            print(f"{guess} was already guessed! try again...\n")
+            guess = input("> ").strip().upper()
 
         result = evaluate_guess(game_state, guess)
-
         game_state["guesses"].append(result)
 
         won = all([x["color"] == bcolors.GREEN for x in result])
@@ -144,25 +144,21 @@ def game_loop():
 
         if not won and not lost:
             continue
-
         elif won:
             print(f"you win, the word was {get_current_guess(game_state)}!\n")
-
         elif lost:
             print(f"you lose :/ the word was {game_state['answer']}")
 
         print("play again? type 1 for yes, 0 for no...\n")
-
-        play_again = input()
+        play_again = input("> ").strip()
 
         while play_again != "0" and play_again != "1":
             print("type 1 to play again or 0 to exit wordle...\n")
-            play_again = input()
+            play_again = input("> ")
 
         if play_again == "1":
             game_state = initialize_game()
             continue
-
         else:
             print("thanks for playing wordle!")
             exit(0)
