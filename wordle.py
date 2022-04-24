@@ -1,8 +1,6 @@
 from words import words
 from random import random
-import copy
-import string
-import os
+import copy, string, os
 
 
 class bcolors:
