@@ -5,7 +5,7 @@ import string
 
 
 class bcolors:
-    RED = "\33[91m"
+    YELLOW = "\33[93m"
     GREEN = "\033[92m"
     DARK_GRAY = "\033[90m"
     ENDC = "\033[0m"
@@ -65,8 +65,8 @@ def evaluate_guess(game_state, guess):
         if result[i] is not None:
             continue
         elif char in game_state["answer"] and letters_ht[char] > 0:
-            result[i] = {"value": char, "color": bcolors.RED}
-            game_state["alphabet"][char] = bcolors.RED
+            result[i] = {"value": char, "color": bcolors.YELLOW}
+            game_state["alphabet"][char] = bcolors.YELLOW
             letters_ht[char] -= 1
         else:
             result[i] = {"value": char, "color": None}
