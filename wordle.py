@@ -2,6 +2,7 @@ from words import words
 from random import random
 import copy
 import string
+import os
 
 
 class bcolors:
@@ -33,15 +34,7 @@ def initialize_game():
     return {
         "answer": answer,
         "letter_distribution": letter_distribution,
-        "guesses": [
-            [
-                {"value": "_", "color": None},
-                {"value": "_", "color": None},
-                {"value": "_", "color": None},
-                {"value": "_", "color": None},
-                {"value": "_", "color": None},
-            ]
-        ],
+        "guesses": [],
         # { 'A': None, 'B': None, ... }
         # will be updated whenever a char match is found
         "alphabet": dict.fromkeys(string.ascii_uppercase, None),
@@ -92,6 +85,20 @@ def get_current_guess(game_state):
     return result
 
 
+def get_all_guesses(game_state):
+    result = ""
+    for guess in game_state["guesses"]:
+        for obj in guess:
+            if obj["color"] is not None:
+                result += obj["color"]
+            result += obj["value"]
+            if obj["color"] is not None:
+                result += bcolors.ENDC
+            result += " "
+        result += "\n"
+    return result
+
+
 def get_current_alphabet(alphabet_dict):
     result = bcolors.ENDC
     for (letter, color) in alphabet_dict.items():
@@ -118,13 +125,12 @@ def already_guessed(game_state, guess):
 
 def game_loop():
     game_title = f"{bcolors.GREEN}python wordle{bcolors.ENDC}"
-    print(f"welcome to {game_title}!\n")
-    # todo: gives wordle directions here...
-
     game_state = initialize_game()
 
     while True:
-        print(f"current guess: {get_current_guess(game_state)}\n")
+        os.system("clear")
+        print(f"welcome to {game_title}!\n")
+        print(get_all_guesses(game_state))
         print(get_current_alphabet(game_state["alphabet"]))
 
         guess = input("> ").strip().upper()
@@ -142,7 +148,7 @@ def game_loop():
         result = evaluate_guess(game_state, guess)
         game_state["guesses"].append(result)
         won = all([x["color"] == bcolors.GREEN for x in result])
-        lost = len(game_state["guesses"]) > 6
+        lost = len(game_state["guesses"]) == 6 and not won
 
         if not won and not lost:
             continue
