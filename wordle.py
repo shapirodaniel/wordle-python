@@ -117,13 +117,18 @@ def already_guessed(game_state, guess):
 
 
 def game_loop():
-    print(f"welcome to {bcolors.GREEN}python wordle!{bcolors.ENDC}\n")
+    game_title = f"{bcolors.GREEN}python wordle{bcolors.ENDC}"
+    print(f"welcome to {game_title}!\n")
     # todo: gives wordle directions here...
+
     game_state = initialize_game()
+
     while True:
         print(f"current guess: {get_current_guess(game_state)}\n")
         print(get_current_alphabet(game_state["alphabet"]))
+
         guess = input("> ").strip().upper()
+
         while len(guess) != 5:
             print("all wordle words are 5 letters! try again...\n")
             guess = input("> ").strip().upper()
@@ -158,7 +163,7 @@ def game_loop():
             game_state = initialize_game()
             continue
         else:
-            print("thanks for playing wordle!")
+            print(f"thanks for playing {game_title}!")
             exit(0)
 
 
